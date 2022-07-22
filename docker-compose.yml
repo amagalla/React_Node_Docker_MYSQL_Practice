@@ -1,0 +1,64 @@
+version: "3.7"
+
+services:
+  client:
+    build: .
+    image: react-app
+    container_name: react-container
+    volumes:
+      - .:/app
+    ports:
+      - "8080:8080"
+    stdin_open: true
+    tty: true
+    networks:
+      - app
+    command: npm run client
+    depends_on:
+      - server
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    container_name: node-container
+    volumes:
+      - .:/app
+      - /var/nodemon.json:/nodemon.json
+    expose:
+      - "3000"
+    ports:
+      - "3000:3000"
+    environment:
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: "userTakeHome"
+      DB_PASSWORD: "takehome"
+      DB_NAME: "takehometest"
+      WAIT_HOSTS: mysql:3306
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 30
+      WAIT_HOST_CONNECT_TIMEOUT: 30
+    command: sh -c "/wait && npm run dev"
+    depends_on:
+      - mysql
+    networks:
+      - app
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-container
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=takehometest
+      - MYSQL_USER=userTakeHome
+      - MYSQL_PASSWORD=takehome
+    volumes:
+      - ./app/lib/db:/docker-entrypoint-initdb.d
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
