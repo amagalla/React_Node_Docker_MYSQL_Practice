@@ -1,6 +1,11 @@
 const express = require("express"),
   router = express.Router(),
-  { registerUser, getUser } = require("../../controller/registeration"),
+  {
+    registerUser,
+    getUser,
+    deleteUser,
+    updateUser,
+  } = require("../../controller/registeration"),
   axios = require("axios");
 
 /**
@@ -23,6 +28,13 @@ const express = require("express"),
  *              password:
  *                  type: string
  *                  example: abc123
+ *      UpdateUser:
+ *          type: object
+ *          description: User's information
+ *          properties:
+ *              first_name:
+ *                  type: string
+ *                  example: Asuna
  */
 
 /**
@@ -48,16 +60,14 @@ const express = require("express"),
  *              description: Registration failed
  */
 
-router.post("/register", async (req, res) => {
+router.post("/register", async (req, res, next) => {
   const resp = await registerUser(req.body);
 
-  if (!resp) {
-    return res.status(400).send({ success: false });
+  if (resp.error) {
+    return next(new Error(resp.error));
   }
 
-  console.log("this is resp!! ", resp);
-
-  res.status(200).send({ success: "User registered" });
+  res.status(200).send(resp);
 });
 
 /**
@@ -74,16 +84,14 @@ router.post("/register", async (req, res) => {
  *              description: Failed to get users
  */
 
-router.get("/login", async (req, res) => {
+router.get("/login", async (req, res, next) => {
   let resp, restResp;
 
-  try {
-    resp = await getUser();
-    restResp = await axios.get(
-      "https://api.sampleapis.com/csscolornames/colors"
-    );
-  } catch (err) {
-    console.log("err");
+  resp = await getUser();
+  restResp = await axios.get("https://api.sampleapis.com/csscolornames/colors");
+
+  if (resp.error) {
+    return next(new Error(resp.error));
   }
 
   const result = {
@@ -92,6 +100,82 @@ router.get("/login", async (req, res) => {
   };
 
   return res.status(200).send(result);
+});
+
+/**
+ * @swagger
+ *
+ *  /api/profiles/deleteUser/{id}:
+ *
+ *  delete:
+ *      description: Delete a User
+ *      produces:
+ *          - application/json
+ *      parameters:
+ *          - in: path
+ *            name: id
+ *            description: The id of a user
+ *            required: true
+ *            type: number
+ *      responses:
+ *          200:
+ *              description: User deleted successfully
+ *          400:
+ *              description: User deletion failed
+ */
+
+router.delete("/deleteUser/:id", async (req, res, next) => {
+  let resp;
+
+  resp = await deleteUser(req.params.id);
+
+  if (resp.error) {
+    return next(new Error(resp.error));
+  }
+
+  return res.status(200).send(resp);
+});
+
+/**
+ * @swagger
+ *
+ *  /api/profiles/updateUser/{id}:
+ *
+ *  patch:
+ *      description: Update User First Name
+ *      produces:
+ *          - application/json
+ *      parameters:
+ *          - in: body
+ *            name: Name to replace first name
+ *            description: The user's first name
+ *            required: true
+ *            schema:
+ *              $ref: '#/definitions/UpdateUser'
+ *          - in: path
+ *            name: id
+ *            description: The id of a user
+ *            required: true
+ *            type: number
+ *      responses:
+ *          200:
+ *              description: User first name updated successfully
+ *          400:
+ *              description: User first name update failed
+ */
+
+router.patch("/updateUser/:id", async (req, res, next) => {
+  let resp;
+
+  console.log("this is req.body!! ", req.body.first_name);
+
+  resp = await updateUser(req.params.id, req.body.first_name);
+
+  if (resp.error) {
+    return next(new Error(resp.error));
+  }
+
+  return res.status(200).send(resp);
 });
 
 module.exports = router;
