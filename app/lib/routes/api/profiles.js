@@ -167,8 +167,6 @@ router.delete("/deleteUser/:id", async (req, res, next) => {
 router.patch("/updateUser/:id", async (req, res, next) => {
   let resp;
 
-  console.log("this is req.body!! ", req.body.first_name);
-
   resp = await updateUser(req.params.id, req.body.first_name);
 
   if (resp.error) {
