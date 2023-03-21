@@ -28,7 +28,7 @@ const app = express(),
 const profiles = require("./routes/api/profiles");
 
 // error handler
-const { errorhandler } = require("./error-handling/error-handler");
+const errorhandler = require("./error-handling/error-handler");
 // parsers
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

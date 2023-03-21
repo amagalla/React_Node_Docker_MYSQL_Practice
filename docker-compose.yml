@@ -32,9 +32,9 @@ services:
     environment:
       DB_HOST: mysql
       DB_PORT: 3306
-      DB_USER: "userTakeHome"
-      DB_PASSWORD: "takehome"
-      DB_NAME: "takehometest"
+      DB_USER: "practice"
+      DB_PASSWORD: "practice"
+      DB_NAME: "practice"
       WAIT_HOSTS: mysql:3306
       WAIT_HOSTS_TIMEOUT: 100
       WAIT_SLEEP_INTERVAL: 10
@@ -51,9 +51,9 @@ services:
     restart: always
     environment:
       - MYSQL_ROOT_PASSWORD=password
-      - MYSQL_DATABASE=takehometest
-      - MYSQL_USER=userTakeHome
-      - MYSQL_PASSWORD=takehome
+      - MYSQL_DATABASE=practice
+      - MYSQL_USER=practice
+      - MYSQL_PASSWORD=practice
     volumes:
       - ./app/lib/db:/docker-entrypoint-initdb.d
     networks:

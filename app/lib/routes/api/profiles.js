@@ -61,9 +61,18 @@ const express = require("express"),
  */
 
 router.post("/register", async (req, res, next) => {
-  const resp = await registerUser(req.body);
+  let resp, error;
 
-  if (resp.error) {
+  if (Object.keys(req.body).length === 0) {
+    error = new Error("Body data is required");
+    error.status = 400;
+    return next(error);
+  }
+
+  try {
+    resp = await registerUser(req.body);
+  } catch (err) {
+    console.log("Ran into an error!!!");
     return next(new Error(resp.error));
   }
 
@@ -87,8 +96,14 @@ router.post("/register", async (req, res, next) => {
 router.get("/login", async (req, res, next) => {
   let resp, restResp;
 
-  resp = await getUser();
-  restResp = await axios.get("https://api.sampleapis.com/csscolornames/colors");
+  try {
+    [resp, restResp] = await Promise.all([
+      getUser(),
+      axios.get("https://api.sampleapis.com/csscolornames/colors"),
+    ]);
+  } catch (err) {
+    return next(new Error(err));
+  }
 
   if (resp.error) {
     return next(new Error(resp.error));
@@ -96,7 +111,7 @@ router.get("/login", async (req, res, next) => {
 
   const result = {
     profile: resp,
-    colors: restResp.data,
+    colors: restResp.data.slice(0, 10),
   };
 
   return res.status(200).send(result);
@@ -127,10 +142,16 @@ router.get("/login", async (req, res, next) => {
 router.delete("/deleteUser/:id", async (req, res, next) => {
   let resp;
 
-  resp = await deleteUser(req.params.id);
+  try {
+    resp = await deleteUser(req.params.id);
+  } catch (err) {
+    return next(new Error(err));
+  }
 
   if (resp.error) {
-    return next(new Error(resp.error));
+    const error = new Error(resp.error);
+    error.status = 400;
+    return next(error);
   }
 
   return res.status(200).send(resp);
@@ -167,10 +188,16 @@ router.delete("/deleteUser/:id", async (req, res, next) => {
 router.patch("/updateUser/:id", async (req, res, next) => {
   let resp;
 
-  resp = await updateUser(req.params.id, req.body.first_name);
+  try {
+    resp = await updateUser(req.params.id, req.body.first_name);
+  } catch (err) {
+    return next(new Error(err));
+  }
 
   if (resp.error) {
-    return next(new Error(resp.error));
+    const error = new Error(resp.error);
+    error.status = 400;
+    return next(error);
   }
 
   return res.status(200).send(resp);

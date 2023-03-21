@@ -50,6 +50,12 @@ const deleteUser = async (id) => {
     };
   }
 
+  if (resp[0].affectedRows === 0) {
+    return {
+      error: "Account already deleted",
+    };
+  }
+
   return {
     success: "Account deleted",
   };
@@ -65,6 +71,12 @@ const updateUser = async (id, body) => {
   } catch (err) {
     return {
       error: err,
+    };
+  }
+
+  if (resp[0].affectedRows === 0) {
+    return {
+      error: "Account not found",
     };
   }
 

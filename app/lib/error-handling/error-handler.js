@@ -1,9 +1,8 @@
-module.exports = {
-  errorhandler: (err, req, res, next) => {
-    console.log(err);
+const errorHandler = (err, req, res, next) => {
+  let status = err.status || 500;
+  let message = err.message || "Internal Server Error";
 
-    res.status(400).send({
-      message: err.message,
-    });
-  },
+  res.status(status).json({ error: message });
 };
+
+module.exports = errorHandler;

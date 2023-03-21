@@ -1,6 +1,6 @@
-CREATE DATABASE IF NOT EXISTS takehometest;
+CREATE DATABASE IF NOT EXISTS practice;
 
-USE takehometest;
+USE practice;
 
 CREATE TABLE IF NOT EXISTS profiles (
     id                  BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
