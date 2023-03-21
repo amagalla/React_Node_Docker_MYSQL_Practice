@@ -72,7 +72,6 @@ router.post("/register", async (req, res, next) => {
   try {
     resp = await registerUser(req.body);
   } catch (err) {
-    console.log("Ran into an error!!!");
     return next(new Error(resp.error));
   }
 
