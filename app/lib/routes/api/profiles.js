@@ -75,6 +75,12 @@ router.post("/register", async (req, res, next) => {
     return next(new Error(resp.error));
   }
 
+  if (resp.error) {
+    error = new Error(resp.error);
+    error.status = 400;
+    return next(error);
+  }
+
   res.status(200).send(resp);
 });
 

@@ -1,7 +1,7 @@
 //  Node imports
 const express = require("express"),
   fs = require("fs"),
-  yml = require("yaml"),
+  yml = require("js-yaml"),
   bodyParser = require("body-parser"),
   cors = require("cors"),
   dotenv = require("dotenv");
@@ -17,7 +17,7 @@ const swaggerFile = fs.readFileSync(
   "./app/lib/config/swaggerOptions.yml",
   "utf-8"
 );
-const options = yml.parse(swaggerFile);
+const options = yml.load(swaggerFile);
 const docs = swaggerDoc(options);
 
 // Express server setup
@@ -43,3 +43,5 @@ app.use("/api/profiles/", profiles);
 app.use(errorhandler);
 
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
+
+module.exports = app;
